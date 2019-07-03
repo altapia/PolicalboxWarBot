@@ -1,0 +1,7 @@
+module.exports = {
+    // telegram bot token
+    token: '123456789:TOKENBOT', 
+    chat_admin: '123456789', //chat id del admin del bot
+    //url_webhook: 'https://example.com' //Si no hay, se configura por pooling
+    listen_port: 3000,
+};
