@@ -10,9 +10,9 @@ exports.find_all = function(callback) {
     let query =  Arma.find({});
     query.sort({beligerante: 1});
     query.populate('beligerante');
-    query.exec(function(err, lsitArmas) {
+    query.exec(function(err, listArmas) {
         if (err) console.error(err);
-        callback(lsitArmas);
+        callback(listArmas);
     });
 };
 
@@ -34,7 +34,7 @@ exports.add = function(descripcion, usuario, callback) {
                 console.error(err);
                 callback(false);
             }
-            callback(true, result);
+            callback(true);
         });
     }else{
         let query =  Beligerante.findOne({nombre: {$eq: usuario}});
@@ -53,7 +53,7 @@ exports.add = function(descripcion, usuario, callback) {
 
                 new_arma.save(function(err, result) {
                     if (err) console.error(err);
-                    callback(true, result);
+                    callback(true);
                 });
             }
         });

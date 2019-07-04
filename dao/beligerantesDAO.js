@@ -55,11 +55,11 @@ exports.add = function(nombre, callback) {
 
             new_beligerante.save(function(err, result) {
                 if (err) console.error(err);
-                callback(true, result);
+                callback(true);
             });
 
         }else{
-            callback(false, beligerante);
+            callback(false);
         }
     });
 };

@@ -15,7 +15,8 @@ var GrupoTelegramSchema = new Schema({
   //Indica si el registro del grupo está activo
   activo: {
     type: Boolean,
-    required: 'Activo, Obligatorio'
+    required: 'Activo, Obligatorio',
+    default: true
   },
   //Fecha de la última ejecución
   fecha_registro:{

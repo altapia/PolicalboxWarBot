@@ -17,12 +17,12 @@ var ArmaSchema = new Schema({
   //nº de veces que ha sido usada el arma
   num_usos: {
       type: Number,
-      default: 1
+      default: 0
   },
   //-1: usos infinitos. 0: No se puede usar
   max_usos: {
       type: Number,
-      default: 0
+      default: 1
   }
 });
 
