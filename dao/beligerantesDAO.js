@@ -27,6 +27,24 @@ exports.find_vivos = function(callback) {
 };
 
 /**
+ * Busca todos los vivos
+ * @param {Function} callback
+ * @param {String} noId Id que se excluirá del random
+ */
+exports.find_random_vivo = function(callback, noId) {
+    let query ;
+    if(typeof noId !== 'undefined'){
+        query =  Beligerante.aggregate([{$match: {vivo: true}}, {$match: {_id:{$ne: noId}}},{$sample: {size:1}}]);
+    }else{
+        query =  Beligerante.aggregate([{$match: {vivo: true}},{$sample: {size:1}}]);
+    }
+    query.exec(function(err, beligerante) {
+        if (err) console.error(err);
+        callback(beligerante);
+    });
+};
+
+/**
  * Actualiza el nº de actuaciones del beligerante asesino,
  * Actualiza el estado Vivo a false del beligerante muerto
  */

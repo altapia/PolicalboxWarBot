@@ -16,6 +16,19 @@ exports.find_all = function(callback) {
 };
 
 /**
+ * Busca todos los grupos de telegram activos
+ * @param {Function} callback (grupos) 
+ */
+exports.find_all_activos = function(callback) {
+    let query =  GrupoTelegram.find({activo:true});
+    query.sort({nombre: 1});
+    query.exec(function(err, list) {
+        if (err) console.error(err);
+        callback(list);
+    });
+};
+
+/**
  * Crea un nuevo grupo. O actualiza a Activo el exsitente
  * @param {String} chatid
  * @param {String} nombre

@@ -6,6 +6,7 @@ var logger = require('../config/winston');
 var beligerantesDao = require('../dao/beligerantesDAO');
 var armasDao = require('../dao/armasDAO');
 var grupoTelegramDao = require('../dao/gruposTelegramDAO');
+var jobsDao = require('../dao/jobControlDAO');
 
 
 const CHAT_ADMIN = config.chat_admin;
@@ -26,6 +27,28 @@ exports.echo = function (msg, match) {
     bot.sendMessage(chatId, resp);
 }
 
+/**
+* Emite un mensaje a todos los grupos registrados
+* @param {TelegramBot.Message} msg 
+* @param {RegExpExecArray} match 
+*/
+exports.broadcast = function (msg, match) {
+
+    let texto = match['input'];
+    let start = texto.indexOf('/broadcast') + '/broadcast'.length  + 1;
+    texto = texto.slice(start);
+
+    var myPromise = new Promise(function (resolve, reject) {
+        grupoTelegramDao.find_all_activos(resolve);
+    });
+
+    myPromise.then((list) => {
+        for (let i = 0; i < list.length; i++) {
+            let gr = list[i];
+            bot.sendMessage(gr.chatid, texto);
+        }
+    });
+}
 
 /**
  * Registrar grupo para schedule
@@ -162,8 +185,9 @@ exports.armas = function (msg) {
         bot.sendMessage(msg.chat.id, result);
     });
 }
+
 /**
- * Añade un nuevo beligerante
+ * Añade un nueva arma
  * @param {TelegramBot.Message} msg 
  * @param {RegExpExecArray} match 
  */
@@ -186,7 +210,86 @@ exports.addArma = function (msg, match) {
             bot.sendMessage(msg.chat.id, 'No se pudo crear el nuevo arma: \n\'' + descripcionArma + '\'');
         }
     });
+}
 
+/**
+ * Muestra el estado de un job
+ * @param {TelegramBot.Message} msg 
+ * @param {RegExpExecArray} match 
+ */
+exports.jobEstado = function (msg, match) {
+    const nombreJob = match[1];
+    var myPromise = new Promise(function (resolve, reject) {
+        jobsDao.findByNombre(nombreJob, resolve);
+    });
+
+    myPromise.then((job) => {
+        if (job!=null) {
+            let mensaje = '**Job '+nombreJob+': **\n';
+            mensaje += 'activo: '+job.activo + '\n';
+            mensaje += 'hora inicio: '+job.hora_inicio + '\n';
+            mensaje += 'hora fin: '+job.hora_fin + '\n';
+            mensaje += 'ult. ejecución: '+job.ultima_ejecucion + '\n';
+
+            bot.sendMessage(msg.chat.id, mensaje);
+        } else {
+            bot.sendMessage(msg.chat.id, 'El job \'' + nombreJob + '\' no existe.');
+        }
+    });
+}
+
+/**
+ * Activa un job
+ * @param {TelegramBot.Message} msg 
+ * @param {RegExpExecArray} match 
+ */
+exports.jobActivar = function (msg, match) {
+    const nombreJob = match[1];
+
+    var myPromise = new Promise(function (resolve, reject) {
+        jobsDao.updateActivo(nombreJob, true, resolve);
+    });
+
+    myPromise.then((job) => {
+        if (job!=null) {
+            let mensaje = '**Job '+nombreJob+' activado. **\n';
+            mensaje += 'activo: '+job.activo + '\n';
+            mensaje += 'hora inicio: '+job.hora_inicio + '\n';
+            mensaje += 'hora fin: '+job.hora_fin + '\n';
+            mensaje += 'ult. ejecución: '+job.ultima_ejecucion + '\n';
+
+            bot.sendMessage(msg.chat.id, mensaje);
+        } else {
+            bot.sendMessage(msg.chat.id, 'El job \'' + nombreJob + '\' no existe.');
+        }
+    });
+}
+
+/**
+ * Activa un job
+ * @param {TelegramBot.Message} msg 
+ * @param {RegExpExecArray} match 
+ */
+exports.jobDesactivar = function (msg, match) {
+    const nombreJob = match[1];
+
+    var myPromise = new Promise(function (resolve, reject) {
+        jobsDao.updateActivo(nombreJob, false, resolve);
+    });
+
+    myPromise.then((job) => {
+        if (job!=null) {
+            let mensaje = '**Job '+nombreJob+' desactivado. **\n';
+            mensaje += 'activo: '+job.activo + '\n';
+            mensaje += 'hora inicio: '+job.hora_inicio + '\n';
+            mensaje += 'hora fin: '+job.hora_fin + '\n';
+            mensaje += 'ult. ejecución: '+job.ultima_ejecucion + '\n';
+
+            bot.sendMessage(msg.chat.id, mensaje);
+        } else {
+            bot.sendMessage(msg.chat.id, 'El job \'' + nombreJob + '\' no existe.');
+        }
+    });
 }
 
 /**

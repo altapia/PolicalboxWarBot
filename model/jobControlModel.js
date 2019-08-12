@@ -17,6 +17,14 @@ var JobControlSchema = new Schema({
   //Fecha de la última ejecución
   ultima_ejecucion:{
     type: Date
+  },
+  hora_inicio: {
+    type: Number,
+    default: 10
+  },
+  hora_fin: {
+    type: Number,
+    default: 18
   }
 });
 
