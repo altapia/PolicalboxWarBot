@@ -140,22 +140,25 @@ exports.beligerantes = function (msg) {
 }
 
 /**
- * Añade un nuevo beligerante
+ * Añade uno o varios beligerantes al duelo
  * @param {TelegramBot.Message} msg 
  * @param {RegExpExecArray} match 
  */
 exports.addBeligerante = function (msg, match) {
-    const nombreBeligerante = match[1];
-
-    var myPromise = new Promise(function (resolve, reject) {
-        beligerantesDao.add(nombreBeligerante, resolve);
-    });
-
-    myPromise.then((nuevo) => {
-        if (nuevo) {
-            bot.sendMessage(msg.chat.id, 'Nuevo beligerante \'' + nombreBeligerante + '\' añadido.');
-        } else {
-            bot.sendMessage(msg.chat.id, 'El beligerante \'' + nombreBeligerante + '\' ya existía.');
+    const beligerantes =  match[1].split(/,|;|-/);
+    beligerantes.forEach(function(beligerante) {
+        const nombreBeligerante = beligerante.trim();
+        if (nombreBeligerante != '') {
+            const myPromise = new Promise(function (resolve, reject) {
+                beligerantesDao.add(nombreBeligerante, resolve);
+            });
+            myPromise.then((nuevo) => {
+                if (nuevo) {
+                    bot.sendMessage(msg.chat.id, 'Nuevo beligerante \'' + nombreBeligerante + '\' añadido.');
+                } else {
+                    bot.sendMessage(msg.chat.id, 'El beligerante \'' + nombreBeligerante + '\' ya existía.');
+                }
+            });
         }
     });
 }
@@ -187,29 +190,33 @@ exports.armas = function (msg) {
 }
 
 /**
- * Añade un nueva arma
+ * Añade una o varias armas al duelo 
  * @param {TelegramBot.Message} msg 
  * @param {RegExpExecArray} match 
  */
 exports.addArma = function (msg, match) {
-    const descripcionArma = match[1].slice(1);
-
     let usuario;
     if (match.length > 2) {
         usuario = match[2].slice(1);
     }
-
-    var myPromise = new Promise(function (resolve, reject) {
-        armasDao.add(descripcionArma, usuario, resolve);
-    });
-
-    myPromise.then((creado) => {
-        if (creado) {
-            bot.sendMessage(msg.chat.id, 'Nuevo arma \'' + descripcionArma + '\' añadida.');
-        } else {
-            bot.sendMessage(msg.chat.id, 'No se pudo crear el nuevo arma: \n\'' + descripcionArma + '\'');
+    const armas =  match[1].split(/,|;|-/);
+    armas.forEach(function(arma) {
+        const descripcionArma = arma.trim();
+        if (descripcionArma != '') {
+            const myPromise = new Promise(function (resolve, reject) {
+                armasDao.add(descripcionArma, usuario, resolve);
+            });
+            myPromise.then((creado) => {
+                if (creado) {
+                    bot.sendMessage(msg.chat.id, 'Nuevo arma \'' + descripcionArma + '\' añadida.');
+                } else {
+                    bot.sendMessage(msg.chat.id, 'No se pudo crear el nuevo arma: \n\'' + descripcionArma + '\'');
+                }
+            });
         }
     });
+
+
 }
 
 /**
